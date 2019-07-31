@@ -7,11 +7,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private Button mBt_reverse,mBt_gray1,mBt_gray2,mBt_gray3,mBt_removeG,mBt_removeB,mBt_removeR;
     private ImageView mImageView;
+    private SeekBar mSeek_brightness,mSeek_contrast;
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("native-lib");
@@ -31,6 +34,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mBt_removeB = findViewById(R.id.bt_removeB);
         mBt_removeR = findViewById(R.id.bt_removeR);
         mImageView = findViewById(R.id.img);
+        mSeek_brightness = findViewById(R.id.seek_brightness);
+        mSeek_contrast = findViewById(R.id.seek_contrast);
         mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.shuchang);
         mBt_reverse.setOnClickListener(this);
         mBt_gray1.setOnClickListener(this);
@@ -39,8 +44,59 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mBt_removeG.setOnClickListener(this);
         mBt_removeB.setOnClickListener(this);
         mBt_removeR.setOnClickListener(this);
+        //亮度
+        mSeek_brightness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.shuchang);
+                int brightness = progress-50;
+                bitmapBrightness(mBitmap,brightness);
+                mImageView.setImageBitmap(mBitmap);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        //对比度
+        mSeek_contrast.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.shuchang);
+                float contrast = progress/100f;
+                bitmapContrast(mBitmap,contrast);
+                mImageView.setImageBitmap(mBitmap);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
     }
 
+    /**
+     * 亮度
+     * @param bitmap
+     */
+    public native void bitmapBrightness(Object bitmap,int brightness);
+
+    /**
+     * 对比度
+     * @param bitmap
+     */
+    public native void bitmapContrast(Object bitmap,float contrast);
     /**
      * 灰度化1
      */

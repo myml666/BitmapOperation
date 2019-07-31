@@ -3,9 +3,9 @@
 #include <android/bitmap.h>
 #include <cmath>
 enum Operation{
-    GRAY1,GRAY2,GRAY3,REVERSE,REMOVEB,REMOVEG,REMOVER
+    GRAY1,GRAY2,GRAY3,REVERSE,REMOVEB,REMOVEG,REMOVER,BRIGHTNESS,CONTRAST
 };
-void operationBitmap(JNIEnv *env,jobject bitmap,Operation operation){
+void operationBitmap(JNIEnv *env,jobject bitmap,Operation operation,int brightness, float contrast ){
     int result;
     // 获取源Bitmap相关信息：宽、高等
     AndroidBitmapInfo sourceInfo;
@@ -61,6 +61,54 @@ void operationBitmap(JNIEnv *env,jobject bitmap,Operation operation){
                 case REMOVER:
                     sourceData[h * width + w] = alpha | 0<<16 | green<<8 | blue;
                     break;
+                case CONTRAST:
+                    red *= contrast;
+                    green *= contrast;
+                    blue *= contrast;
+                    if(red>255){
+                        red = 255;
+                    }
+                    if(red<0){
+                        red = 0;
+                    }
+                    if(green>255){
+                        green = 255;
+                    }
+                    if(green<0){
+                        green = 0;
+                    }
+                    if(blue>255){
+                        blue = 255;
+                    }
+                    if(blue<0){
+                        blue = 0;
+                    }
+                    sourceData[h * width + w] = alpha | red<<16 | green<<8 | blue;
+                    break;
+                case BRIGHTNESS:
+                    red += brightness;
+                    green += brightness;
+                    blue += brightness;
+                    if(red>255){
+                        red = 255;
+                    }
+                    if(red<0){
+                        red = 0;
+                    }
+                    if(green>255){
+                        green = 255;
+                    }
+                    if(green<0){
+                        green = 0;
+                    }
+                    if(blue>255){
+                        blue = 255;
+                    }
+                    if(blue<0){
+                        blue = 0;
+                    }
+                    sourceData[h * width + w] = alpha | red<<16 | green<<8 | blue;
+                    break;
             }
         }
     }
@@ -70,32 +118,43 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_itfitness_bitmapoperation_MainActivity_bitmapGray1(JNIEnv *env, jobject instance,
                                                             jobject bitmap) {
-    operationBitmap(env,bitmap,GRAY1);
+    operationBitmap(env,bitmap,GRAY1,0,1);
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_itfitness_bitmapoperation_MainActivity_bitmapGray2(JNIEnv *env, jobject instance,jobject bitmap) {
-    operationBitmap(env,bitmap,GRAY2);
+    operationBitmap(env,bitmap,GRAY2,0,1);
 
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_itfitness_bitmapoperation_MainActivity_bitmapGray3(JNIEnv *env, jobject instance,jobject bitmap) {
-    operationBitmap(env,bitmap,GRAY3);
+    operationBitmap(env,bitmap,GRAY3,0,1);
 
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_itfitness_bitmapoperation_MainActivity_bitmapReverse(JNIEnv *env, jobject instance,jobject bitmap) {
-    operationBitmap(env,bitmap,REVERSE);
+    operationBitmap(env,bitmap,REVERSE,0,1);
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_itfitness_bitmapoperation_MainActivity_bitmapRemoveB(JNIEnv *env, jobject instance,jobject bitmap) {
-    operationBitmap(env,bitmap,REMOVEB);
+    operationBitmap(env,bitmap,REMOVEB,0,1);
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_itfitness_bitmapoperation_MainActivity_bitmapRemoveG(JNIEnv *env, jobject instance,jobject bitmap) {
-    operationBitmap(env,bitmap,REMOVEG);
+    operationBitmap(env,bitmap,REMOVEG,0,1);
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_itfitness_bitmapoperation_MainActivity_bitmapRemoveR(JNIEnv *env, jobject instance,jobject bitmap) {
-    operationBitmap(env,bitmap,REMOVER);
+    operationBitmap(env,bitmap,REMOVER,0,1);
 
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_itfitness_bitmapoperation_MainActivity_bitmapBrightness(JNIEnv *env, jobject instance,
+                                                                 jobject bitmap, jint brightness) {
+    operationBitmap(env,bitmap,BRIGHTNESS,brightness,1);
+
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_itfitness_bitmapoperation_MainActivity_bitmapContrast(JNIEnv *env, jobject instance,
+                                                               jobject bitmap, jfloat contrast) {
+    operationBitmap(env,bitmap,CONTRAST,0,contrast);
 }
